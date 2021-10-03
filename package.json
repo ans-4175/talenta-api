@@ -1,0 +1,28 @@
+{
+  "name": "talenta-api",
+  "version": "1.0.0",
+  "description": "API HR Talenta for ClockIn and ClockOut",
+  "main": "index.js",
+  "scripts": {
+    "clockin": "node index.js clockin",
+    "clockout": "node index.js clockout",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ans-4175/talenta-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ans-4175/talenta-api/issues"
+  },
+  "homepage": "https://github.com/ans-4175/talenta-api#readme",
+  "dependencies": {
+    "axios": "^0.22.0",
+    "cheerio": "^1.0.0-rc.10",
+    "form-data": "^4.0.0",
+    "readline-sync": "^1.4.10",
+    "string-codec": "^0.1.0"
+  }
+}
