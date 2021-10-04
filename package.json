@@ -21,7 +21,6 @@
   "dependencies": {
     "axios": "^0.22.0",
     "form-data": "^4.0.0",
-    "readline-sync": "^1.4.10",
     "string-codec": "^0.1.0"
   }
 }
