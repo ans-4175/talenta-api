@@ -9,11 +9,13 @@ API HR Talenta for ClockIn and ClockOut, so you don't need to open the app and c
 3. yarn
 
 ## Installation
-Just run `yarn install`
+Just run `yarn install` or `npm install`
 
 ## How to Run Program
 
-At first you need to specify this three variable `Cookie`, `Latitude` and `Longitude`
+At first you need to specify this three variable `Cookie`, `Latitude` and `Longitude`.  
+You could copy from `config.js.tmpl` to `config.js` then change it according your value.  
+Then you could run using script defined in `package.json`
 
 ### How to get Cookie?
 
@@ -24,7 +26,7 @@ At first you need to specify this three variable `Cookie`, `Latitude` and `Longi
 ![](img/get-cookie.png)
 4. copy the value
 5. prepare the value for program with `PHPSESSID=<value>` or `_identity=<value>`
-6. open the file `execute.js` and change the variable `cookiesTalenta` to `PHPSESSID=<value>` or `_identity=<value>`
+6. open the file `config.js` (copy from `config.js.tmpl`) and change the variable `cookiesTalenta` to `PHPSESSID=<value>` or `_identity=<value>`
 6. and good news the cookie will last forever
 
 ### How to get Latitude and Longitude?
@@ -37,7 +39,7 @@ At first you need to specify this three variable `Cookie`, `Latitude` and `Longi
 -6.861928521923624, 107.63578698474662
 Latitude          , Longitude
 ```
-4. open the file `execute.js` and change the variable `latitude` and `longitude` following with the value copied from google map
+4. open the file `config.js` (copy from `config.js.tmpl`) and change the variable `latitude` and `longitude` following with the value copied from google map
 
 ### Example to run the program
 
@@ -50,3 +52,12 @@ or
 yarn run clockout
 ```
 to clockout
+
+## Methods in module
+
+### Clock In / ClockOut
+Functions: `clockIn` and `clockOut`  
+Parameters
+```
+{ lat: '-6.000', long: '107.000', cookies: 'PHPSESSID=<value>', desc: 'message' }
+```

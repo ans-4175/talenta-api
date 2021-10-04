@@ -1,12 +1,10 @@
-const talenta = require("./index.js")
+const talenta = require("./index");
+const { cookiesTalenta, longitude, latitude } = require("./config");
 
-// you can use the `_identity=` or `PHPSESSID=` cookie
-const cookiesTalenta = "_identity=identityCookie"
-const latitude = "-6.861928521923624"
-const longitude = "107.63578698474662"
-
-if(process.argv[2] == "clockin"){
-  console.log(talenta.clockIn({ lat: latitude, long: longitude, cookies: cookiesTalenta, desc: 'Talenta Clock In' }));
-}else if(process.argv[2] == "clockout"){
-  console.log(talenta.clockOut({ lat: latitude, long: longitude, cookies: cookiesTalenta, desc: 'Talenta Clock In' }));
-}
+(async () => {
+  if (process.argv[2] == "clockin") {
+    console.log(await talenta.clockIn({ lat: latitude, long: longitude, cookies: cookiesTalenta, desc: 'Hello I am In' }));
+  } else if (process.argv[2] == "clockout") {
+    console.log(await talenta.clockOut({ lat: latitude, long: longitude, cookies: cookiesTalenta, desc: 'Goodbye I am Out' }));
+  }
+})();
