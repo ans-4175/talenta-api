@@ -6,7 +6,9 @@
   "scripts": {
     "clockin": "node execute.js clockin",
     "clockout": "node execute.js clockout",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "scheduler:clockin": "pm2 start 'yarn clockin'",
+    "scheduler:clockout": "pm2 start 'yarn clockout'",
+    "scheduler:stop": "pm2 delete all"
   },
   "repository": {
     "type": "git",
@@ -21,6 +23,8 @@
   "dependencies": {
     "axios": "^0.22.0",
     "form-data": "^4.0.0",
+    "node-cron": "^3.0.0",
+    "pm2": "^5.1.2",
     "string-codec": "^0.1.0"
   }
 }
