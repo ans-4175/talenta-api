@@ -1,7 +1,6 @@
 const axios = require("axios");
 const FormData = require("form-data");
 const codec = require("string-codec");
-const cron = require("node-cron");
 
 const prepForm = (obj) => {
   const { long, lat, desc, cookies, isCheckOut = false } = obj;

@@ -1,4 +1,6 @@
 const talenta = require("./index");
+const cron = require("node-cron");
+const pm2 = require("pm2");
 const { cookiesTalenta, longitude, latitude, timeClockIn, timeClockOut } = require("./config");
 
 const parseTime = (time) => {
