@@ -25,7 +25,4 @@ const { cookiesTalenta, longitude, latitude, timeClockIn, timeClockOut, onWeekda
       })
     );
   }
-  // else if (process.argv[2] == "scheduled") {
-  //   console.log(await talenta.scheduled({ lat: latitude, long: longitude, cookies: cookiesTalenta, desc: "Goodbye I am Out" }));
-  // }
 })();

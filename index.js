@@ -35,17 +35,15 @@ const parseTime = (time) => {
 
 const attendancePost = async (obj) => {
   const config = prepForm(obj);
-  // const resp = await axios(config);
+  const resp = await axios(config);
 
-  // return resp.data;
-  return `POST attendance with ${JSON.stringify(config)}`;
+  return resp.data;
 };
 
 const scheduler = async (time, callback) => {
   const [hour, min] = parseTime(time);
 
   const task = cron.schedule(`${min} ${hour} * * 1-5`, async () => {
-    // const task = cron.schedule(`*/5 * * * * *`, async () => {
     console.log(await callback);
   });
 
