@@ -51,26 +51,15 @@ const scheduler = async (time, callback) => {
 };
 
 const clockIn = async (obj) => {
-  const { timeClockIn } = obj;
-  if (timeClockIn) {
-    const task = await scheduler(timeClockIn, attendancePost({ ...obj, isCheckOut: false }));
-    return `Start scheduler for your clockIn every ${timeClockIn}`;
-  }
-
   return await attendancePost({ ...obj, isCheckOut: false });
 };
 
 const clockOut = async (obj) => {
-  const { timeClockOut } = obj;
-  if (timeClockOut) {
-    const task = await scheduler(timeClockOut, attendancePost({ ...obj, isCheckOut: true }));
-    return `Start scheduler for your clockOut every ${timeClockOut}`;
-  }
-
   return await attendancePost({ ...obj, isCheckOut: true });
 };
 
 module.exports = {
   clockIn,
   clockOut,
+  scheduler,
 };

@@ -6,9 +6,8 @@
   "scripts": {
     "clockin": "node execute.js clockin",
     "clockout": "node execute.js clockout",
-    "scheduler:clockin": "pm2 start 'yarn clockin'",
-    "scheduler:clockout": "pm2 start 'yarn clockout'",
-    "scheduler:stop": "pm2 delete all"
+    "scheduler:start": "pm2 start scheduler.js --name talenta",
+    "scheduler:stop": "pm2 delete talenta"
   },
   "repository": {
     "type": "git",
