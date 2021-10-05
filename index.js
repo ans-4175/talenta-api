@@ -29,25 +29,11 @@ const prepForm = (obj) => {
   return config;
 };
 
-const parseTime = (time) => {
-  return time.split(":");
-};
-
 const attendancePost = async (obj) => {
   const config = prepForm(obj);
   const resp = await axios(config);
 
   return resp.data;
-};
-
-const scheduler = async (time, callback) => {
-  const [hour, min] = parseTime(time);
-
-  const task = cron.schedule(`${min} ${hour} * * 1-5`, async () => {
-    console.log(await callback);
-  });
-
-  return task;
 };
 
 const clockIn = async (obj) => {
@@ -61,5 +47,4 @@ const clockOut = async (obj) => {
 module.exports = {
   clockIn,
   clockOut,
-  scheduler,
 };

@@ -1,5 +1,5 @@
 const talenta = require("./index");
-const { cookiesTalenta, longitude, latitude, timeClockIn, timeClockOut } = require("./config");
+const { cookiesTalenta, longitude, latitude } = require("./config");
 
 (async () => {
   if (process.argv[2] == "clockin") {
