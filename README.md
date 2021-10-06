@@ -62,7 +62,7 @@ To start the scheduler, simply run
 yarn scheduler:start
 ```
 
-And to stop the shceduler, run,
+And to stop the scheduler, run,
 ```
 yarn scheduler:stop
 ```
