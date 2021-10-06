@@ -21,7 +21,7 @@ Then you could run using script defined in `package.json`
 
 1. you need to login with this url `https://account.mekari.com/users/sign_in?app_referer=Talenta` and sign in
 ![](img/login.png)
-2. after login on the browser preff `F12`
+2. after login on the browser press `F12`
 3. the new window/new window on bottom screen will popup and switch to `Application` tab, pick `Cookie`->`https://hr.talenta.co` and then scroll down until get the Cookie with name `PHPSESSID` or `_identity` 
 ![](img/get-cookie.png)
 4. copy the value
@@ -52,6 +52,22 @@ or
 yarn run clockout
 ```
 to clockout
+
+### How to schedule your clockIn and clockOut
+It is just by adding `timeClockIn` and `timeClockOut` within `config.js` file. The time format is `hh:mm`.
+It is important to note, that you have to define both variables, otherwise, the scheduler won't work.
+
+To start the scheduler, simply run
+```
+yarn scheduler:start
+```
+
+And to stop the scheduler, run,
+```
+yarn scheduler:stop
+```
+
+If you want to change the time for your clockIn and clockOut, you have to stop and restart the scheduler.
 
 ## Methods in module
 
