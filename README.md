@@ -17,6 +17,19 @@ At first you need to specify this three variable `Cookie`, `Latitude` and `Longi
 You could copy from `config.js.tmpl` to `config.js` then change it according your value.  
 Then you could run using script defined in `package.json`
 
+### Testing the Signature Fix
+
+If you're experiencing 403 signature errors, you can test the fix with:
+```
+npm run test-fix
+```
+or
+```
+yarn test-fix
+```
+
+This will help diagnose any remaining authentication issues and verify the signature fix is working.
+
 ### How to get Cookie?
 
 1. you need to login with this url `https://account.mekari.com/users/sign_in?app_referer=Talenta` and sign in
