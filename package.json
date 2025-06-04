@@ -11,8 +11,8 @@
     "test-fix": "node test-script/test-fix.js",
     "test-fetch-cookies": "node test-script/test-fetch-cookies.js",
     "test-unit": "node test-script/test-unit.js",
-    "test-all": "npm run test-unit && npm run test-fix && npm run test-fetch-cookies",
-    "test-automated": "npm run test-unit && npm run test-fix",
+    "test-all": "find test-script -name 'test-*' -type f | xargs -I {} node {}",
+    "test-automated": "find test-script -name 'test-*' -type f | grep -v test-fetch-cookies | xargs -I {} node {}",
     "example-fetch-cookies": "node examples/fetch-cookies-example.js"
   },
   "repository": {
