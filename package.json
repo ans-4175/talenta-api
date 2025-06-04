@@ -8,7 +8,7 @@
     "clockout": "node execute.js clockout",
     "scheduler:start": "node start.js",
     "scheduler:stop": "node stop.js",
-    "test-fix": "node test-fix.js"
+    "test-fix": "node test-script/test-fix.js"
   },
   "repository": {
     "type": "git",
