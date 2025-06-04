@@ -5,7 +5,7 @@ API HR Talenta for ClockIn and ClockOut, so you don't need to open the app and c
 
 ## Requirement
 1. npm
-2. nodejs
+2. nodejs (version 18 or higher - required for native fetch and FormData support)
 3. yarn
 
 ## Installation
