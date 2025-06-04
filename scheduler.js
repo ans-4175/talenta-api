@@ -8,6 +8,35 @@ const parseTime = (time) => {
   return time.split(":");
 };
 
+const getCookies = async () => {
+  // Check if email and password are provided for automatic authentication
+  if (config.email && config.password) {
+    console.log('🔐 Using automatic authentication with email/password...');
+    try {
+      return await talenta.fetchCookies(config.email, config.password);
+    } catch (error) {
+      console.warn('⚠️  Automatic authentication failed:', error.message);
+      console.log('🔄 Falling back to manual cookies...');
+      
+      if (!config.cookiesTalenta || config.cookiesTalenta === 'PHPSESSID=<value>') {
+        throw new Error('Manual cookies not configured. Please set either email/password or cookiesTalenta in config.js');
+      }
+      return config.cookiesTalenta;
+    }
+  }
+  
+  // Fallback to manual cookies
+  if (!config.cookiesTalenta || config.cookiesTalenta === 'PHPSESSID=<value>') {
+    throw new Error('Authentication not configured. Please set either:\n' +
+      '1. email and password for automatic authentication, OR\n' +
+      '2. cookiesTalenta for manual cookie authentication\n' +
+      'Check config.js.tmpl for examples.');
+  }
+  
+  console.log('🍪 Using manual cookie authentication...');
+  return config.cookiesTalenta;
+};
+
 const scheduler = async (time, callback) => {
   const [hour, min] = parseTime(time);
 
@@ -32,17 +61,27 @@ const scheduler = async (time, callback) => {
       process.exit(1);
     }
     
+    // Get cookies once at startup for scheduler
+    let cookies;
+    try {
+      cookies = await getCookies();
+      console.log('✅ Authentication configured successfully');
+    } catch (error) {
+      console.error("❌ Error with authentication:", error.message);
+      process.exit(1);
+    }
+    
     await scheduler(config.timeClockIn, () => talenta.clockIn({ 
       lat: location.latitude, 
       long: location.longitude, 
-      cookies: config.cookiesTalenta, 
+      cookies: cookies, 
       desc: "Hello I am In" 
     }));
     
     await scheduler(config.timeClockOut, () => talenta.clockOut({ 
       lat: location.latitude, 
       long: location.longitude, 
-      cookies: config.cookiesTalenta, 
+      cookies: cookies, 
       desc: "Goodbye I am Out" 
     }));
   } else {
