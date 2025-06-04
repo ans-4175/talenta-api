@@ -1,10 +1,29 @@
 const talenta = require("./index");
-const { cookiesTalenta, longitude, latitude } = require("./config");
+const { getLocation } = require("./location");
+const config = require("./config");
 
 (async () => {
-  if (process.argv[2] == "clockin") {
-    console.log(await talenta.clockIn({ lat: latitude, long: longitude, cookies: cookiesTalenta, desc: "Hello I am In" }));
-  } else if (process.argv[2] == "clockout") {
-    console.log(await talenta.clockOut({ lat: latitude, long: longitude, cookies: cookiesTalenta, desc: "Goodbye I am Out" }));
+  try {
+    // Get location (auto-detect or fallback to config)
+    const location = await getLocation(config);
+    
+    if (process.argv[2] == "clockin") {
+      console.log(await talenta.clockIn({ 
+        lat: location.latitude, 
+        long: location.longitude, 
+        cookies: config.cookiesTalenta, 
+        desc: "Hello I am In" 
+      }));
+    } else if (process.argv[2] == "clockout") {
+      console.log(await talenta.clockOut({ 
+        lat: location.latitude, 
+        long: location.longitude, 
+        cookies: config.cookiesTalenta, 
+        desc: "Goodbye I am Out" 
+      }));
+    }
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+    process.exit(1);
   }
 })();

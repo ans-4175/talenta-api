@@ -13,7 +13,9 @@ Just run `yarn install` or `npm install`
 
 ## How to Run Program
 
-At first you need to specify this three variable `Cookie`, `Latitude` and `Longitude`.  
+**NEW**: The application now features automatic location detection! You only need to configure the `Cookie` value, as latitude and longitude will be automatically detected from your device location.
+
+At minimum you need to specify the `Cookie` variable. For fallback purposes, you should also configure `Latitude` and `Longitude`.  
 You could copy from `config.js.tmpl` to `config.js` then change it according your value.  
 Then you could run using script defined in `package.json`
 
@@ -42,7 +44,23 @@ This will help diagnose any remaining authentication issues and verify the signa
 6. open the file `config.js` (copy from `config.js.tmpl`) and change the variable `cookiesTalenta` to `PHPSESSID=<value>` or `_identity=<value>`
 6. and good news the cookie will last forever
 
-### How to get Latitude and Longitude?
+### Auto Location Detection
+
+**NEW FEATURE**: The application now automatically detects your location using your device's geolocation capabilities! This means you no longer need to manually configure latitude and longitude in most cases.
+
+**How it works:**
+- When you run clockin/clockout, the app will automatically try to detect your current location
+- If location detection succeeds, it will use your actual coordinates
+- If location detection fails (e.g., no browser access, permission denied), it will fallback to the configured coordinates in `config.js`
+
+**Benefits:**
+- No manual coordinate configuration needed
+- More accurate location based on your actual device location
+- Automatic fallback ensures the app always works
+
+### How to get Latitude and Longitude? (Manual Configuration)
+
+**Note**: With the new auto-location detection, you may not need to manually configure coordinates. However, you should still set fallback coordinates in case auto-detection fails.
 
 1. its easy, just go to google map
 2. right click on the location

@@ -22,6 +22,7 @@
   "homepage": "https://github.com/ans-4175/talenta-api#readme",
   "dependencies": {
     "node-cron": "^3.0.0",
-    "pm2": "^5.1.2"
+    "pm2": "^5.1.2",
+    "puppeteer": "^24.10.0"
   }
 }
