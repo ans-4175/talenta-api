@@ -139,7 +139,190 @@ const clockOut = async (obj) => {
   return await attendancePost({ ...obj, isCheckOut: true });
 };
 
+/**
+ * Extract authenticity token from login page
+ * @param {string} html - HTML content of the login page
+ * @returns {string|null} - The authenticity token or null if not found
+ */
+const extractAuthenticityToken = (html) => {
+  const tokenMatches = [
+    html.match(/name="authenticity_token" value="([^"]+)"/),
+    html.match(/<input[^>]*name="authenticity_token"[^>]*value="([^"]+)"/),
+    html.match(/authenticity_token[^"]*"([^"]+)"/),
+  ];
+  
+  for (const match of tokenMatches) {
+    if (match) return match[1];
+  }
+  
+  return null;
+};
+
+/**
+ * Extract cookies from response headers
+ * @param {Headers} headers - Response headers
+ * @returns {string} - Formatted cookie string
+ */
+const extractCookies = (headers) => {
+  const setCookies = headers.get('set-cookie');
+  if (!setCookies) return '';
+  
+  const cookies = setCookies.split(',').map(cookie => {
+    return cookie.trim().split(';')[0];
+  }).join('; ');
+  
+  return cookies;
+};
+
+/**
+ * Fetch cookies automatically using username and password
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @returns {Promise<string>} - Cookie string for use with clockIn/clockOut
+ */
+const fetchCookies = async (email, password) => {
+  try {
+    // Step 1: Get login page and extract authenticity token
+    console.log('🔐 Starting authentication process...');
+    
+    const loginPageUrl = 'https://account.mekari.com/users/sign_in?app_referer=Talenta';
+    const loginPageResponse = await fetch(loginPageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+      },
+    });
+    
+    if (!loginPageResponse.ok) {
+      throw new Error(`Failed to load login page: ${loginPageResponse.status}`);
+    }
+    
+    const loginPageHtml = await loginPageResponse.text();
+    const authenticityToken = extractAuthenticityToken(loginPageHtml);
+    
+    if (!authenticityToken) {
+      throw new Error('Could not extract authenticity token from login page');
+    }
+    
+    const mekariCookie = extractCookies(loginPageResponse.headers);
+    console.log('✅ Successfully extracted authenticity token');
+    
+    // Step 2: Submit login form
+    console.log('🔑 Submitting login credentials...');
+    
+    const formData = new FormData();
+    formData.append('utf8', '✓');
+    formData.append('authenticity_token', authenticityToken);
+    formData.append('user[email]', email);
+    formData.append('no-captcha-token', '');
+    formData.append('user[password]', password);
+    
+    const loginResponse = await fetch(loginPageUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Cookie': mekariCookie,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        'Referer': loginPageUrl,
+        'Origin': 'https://account.mekari.com',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+        'Upgrade-Insecure-Requests': '1',
+      },
+      body: formData,
+      redirect: 'manual', // Handle redirects manually
+    });
+    
+    // Check for successful login (should get 302 redirect)
+    if (loginResponse.status !== 302) {
+      const errorText = await loginResponse.text();
+      if (errorText.includes('Invalid email or password')) {
+        throw new Error('Invalid email or password');
+      }
+      throw new Error(`Login failed: ${loginResponse.status} ${loginResponse.statusText}`);
+    }
+    
+    const loginCookies = extractCookies(loginResponse.headers);
+    console.log('✅ Login successful');
+    
+    // Step 3: Get authorization code
+    console.log('🔗 Getting authorization code...');
+    
+    const authUrl = 'https://account.mekari.com/auth?client_id=TAL-73645&response_type=code&scope=sso:profile';
+    const authResponse = await fetch(authUrl, {
+      headers: {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Cookie': `${mekariCookie}; ${loginCookies}`,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        'Referer': loginPageUrl,
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+        'Upgrade-Insecure-Requests': '1',
+      },
+      redirect: 'manual',
+    });
+    
+    if (authResponse.status !== 302) {
+      throw new Error(`Authorization failed: ${authResponse.status} ${authResponse.statusText}`);
+    }
+    
+    const locationHeader = authResponse.headers.get('location');
+    if (!locationHeader || !locationHeader.includes('hr.talenta.co/sso-callback')) {
+      throw new Error('Invalid authorization redirect');
+    }
+    
+    console.log('✅ Authorization successful');
+    
+    // Step 4: Follow redirect to get final cookies
+    console.log('🍪 Getting final session cookies...');
+    
+    const finalResponse = await fetch(locationHeader, {
+      headers: {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'cross-site',
+        'Sec-Fetch-User': '?1',
+        'Upgrade-Insecure-Requests': '1',
+      },
+      redirect: 'manual',
+    });
+    
+    const finalCookies = extractCookies(finalResponse.headers);
+    
+    if (!finalCookies) {
+      throw new Error('Failed to get session cookies from Talenta');
+    }
+    
+    console.log('✅ Successfully obtained session cookies');
+    
+    // Extract PHPSESSID or _identity cookie specifically
+    const cookieMatch = finalCookies.match(/(?:PHPSESSID|_identity)=[^;]+/);
+    if (cookieMatch) {
+      return cookieMatch[0];
+    }
+    
+    // If no specific cookie found, return all cookies
+    return finalCookies;
+    
+  } catch (error) {
+    console.error('❌ Cookie fetching failed:', error.message);
+    throw error;
+  }
+};
+
 module.exports = {
   clockIn,
   clockOut,
+  fetchCookies,
 };
