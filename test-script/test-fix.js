@@ -2,13 +2,13 @@
 /**
  * Test script to verify the signature fix
  * 
- * Usage: node test-fix.js
+ * Usage: node test-script/test-fix.js
  * 
  * This script will test the enhanced API with CSRF token support
  * and better error handling to help diagnose signature issues.
  */
 
-const talenta = require('./index');
+const talenta = require('../index');
 
 async function testFix() {
     console.log('🔧 Testing Talenta API signature fix...\n');
@@ -16,7 +16,7 @@ async function testFix() {
     // Check if config file exists
     let config;
     try {
-        config = require('./config');
+        config = require('../config');
         console.log('✅ Config file loaded successfully');
     } catch (error) {
         console.log('❌ Config file not found. Please copy config.js.tmpl to config.js and configure it.');

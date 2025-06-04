@@ -8,7 +8,7 @@
     "clockout": "node execute.js clockout",
     "scheduler:start": "node start.js",
     "scheduler:stop": "node stop.js",
-    "test-fix": "node test-fix.js"
+    "test-fix": "node test-script/test-fix.js"
   },
   "repository": {
     "type": "git",
@@ -21,10 +21,7 @@
   },
   "homepage": "https://github.com/ans-4175/talenta-api#readme",
   "dependencies": {
-    "axios": "^0.22.0",
-    "form-data": "^4.0.0",
     "node-cron": "^3.0.0",
-    "pm2": "^5.1.2",
-    "string-codec": "^0.1.0"
+    "pm2": "^5.1.2"
   }
 }
