@@ -9,6 +9,7 @@
  */
 
 const talenta = require('../index');
+const { extractAuthenticityToken, extractCookies } = require('../lib/auth-helpers');
 
 // Test helper functions
 function testExtractAuthenticityToken() {
@@ -39,20 +40,8 @@ function testExtractAuthenticityToken() {
   
   for (const testCase of testCases) {
     try {
-      // We need to access the internal function - let's test the pattern matching logic
-      const tokenMatches = [
-        testCase.html.match(/name="authenticity_token" value="([^"]+)"/),
-        testCase.html.match(/<input[^>]*name="authenticity_token"[^>]*value="([^"]+)"/),
-        testCase.html.match(/authenticity_token[^"]*"([^"]+)"/),
-      ];
-      
-      let result = null;
-      for (const match of tokenMatches) {
-        if (match) {
-          result = match[1];
-          break;
-        }
-      }
+      // Use the actual function from auth-helpers
+      const result = extractAuthenticityToken(testCase.html);
       
       if (result === testCase.expected) {
         console.log(`   ✅ Passed: "${testCase.html}" -> "${result}"`);
@@ -101,15 +90,8 @@ function testExtractCookies() {
     try {
       const headers = createMockHeaders(testCase.setCookie);
       
-      // Replicate the logic from extractCookies
-      const setCookies = headers.get('set-cookie');
-      let result = '';
-      
-      if (setCookies) {
-        result = setCookies.split(',').map(cookie => {
-          return cookie.trim().split(';')[0];
-        }).join('; ');
-      }
+      // Use the actual function from auth-helpers
+      const result = extractCookies(headers);
       
       if (result === testCase.expected) {
         console.log(`   ✅ Passed: "${testCase.setCookie}" -> "${result}"`);
