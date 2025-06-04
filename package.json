@@ -10,7 +10,8 @@
     "scheduler:stop": "node stop.js",
     "test-fix": "node test-script/test-fix.js",
     "test-fetch-cookies": "node test-script/test-fetch-cookies.js",
-    "test-unit": "node test-script/test-unit.js"
+    "test-unit": "node test-script/test-unit.js",
+    "example-fetch-cookies": "node examples/fetch-cookies-example.js"
   },
   "repository": {
     "type": "git",
