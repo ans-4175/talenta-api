@@ -1,93 +1,65 @@
-const puppeteer = require('puppeteer');
+const https = require('https');
 
 /**
- * Detect user's current location using browser geolocation API
+ * Detect user's current location using IP-based geolocation
  * @returns {Promise<{latitude: string, longitude: string}>} Location coordinates
  */
 async function detectLocation() {
-  let browser;
-  
-  try {
-    console.log('🌍 Detecting your location...');
-    
-    // Launch browser with necessary permissions
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--no-first-run',
-        '--disable-default-apps',
-        '--disable-background-timer-throttling'
-      ]
-    });
-    
-    const page = await browser.newPage();
-    
-    // Set geolocation permissions
-    const context = browser.defaultBrowserContext();
-    await context.overridePermissions('https://www.google.com', ['geolocation']);
-    
-    // Navigate to a simple page
-    await page.goto('data:text/html,<html><body></body></html>');
-    
-    // Get location using browser geolocation API
-    const location = await page.evaluate(() => {
-      return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-          reject(new Error('Geolocation is not supported by this browser'));
-          return;
-        }
+  return new Promise((resolve, reject) => {
+    try {
+      console.log('🌍 Detecting your location...');
+      
+      // Use ip-api.com for free IP geolocation (no API key required)
+      const url = 'https://ip-api.com/json/?fields=lat,lon,city,country,status,message';
+      
+      const req = https.get(url, (res) => {
+        let data = '';
         
-        const timeoutId = setTimeout(() => {
-          reject(new Error('Location detection timeout'));
-        }, 10000); // 10 second timeout
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
         
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            clearTimeout(timeoutId);
+        res.on('end', () => {
+          try {
+            const result = JSON.parse(data);
+            
+            if (result.status === 'fail') {
+              reject(new Error(result.message || 'IP geolocation service error'));
+              return;
+            }
+            
+            if (!result.lat || !result.lon) {
+              reject(new Error('Location coordinates not available'));
+              return;
+            }
+            
+            console.log(`✅ Location detected: ${result.lat}, ${result.lon} (${result.city}, ${result.country})`);
+            
             resolve({
-              latitude: position.coords.latitude.toString(),
-              longitude: position.coords.longitude.toString(),
-              accuracy: position.coords.accuracy
+              latitude: result.lat.toString(),
+              longitude: result.lon.toString()
             });
-          },
-          (error) => {
-            clearTimeout(timeoutId);
-            reject(new Error(`Geolocation error: ${error.message}`));
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 8000,
-            maximumAge: 60000
+            
+          } catch (parseError) {
+            reject(new Error(`Failed to parse location response: ${parseError.message}`));
           }
-        );
+        });
       });
-    });
-    
-    console.log(`✅ Location detected: ${location.latitude}, ${location.longitude} (accuracy: ${Math.round(location.accuracy)}m)`);
-    
-    return {
-      latitude: location.latitude,
-      longitude: location.longitude
-    };
-    
-  } catch (error) {
-    // Handle common Chrome/Puppeteer installation issues
-    if (error.message.includes('Could not find Chrome') || error.message.includes('Failed to launch')) {
-      console.warn('⚠️  Chrome browser not available for location detection');
-      throw new Error('Browser not available for location detection');
-    } else {
+      
+      req.on('error', (error) => {
+        reject(new Error(`Network request failed: ${error.message}`));
+      });
+      
+      req.setTimeout(10000, () => {
+        req.destroy();
+        reject(new Error('Location detection timeout'));
+      });
+      
+    } catch (error) {
       console.warn(`⚠️  Location detection failed: ${error.message}`);
-      throw error;
+      reject(error);
     }
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
-  }
+  });
 }
 
 /**
