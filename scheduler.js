@@ -1,7 +1,8 @@
 const talenta = require("./index");
 const cron = require("node-cron");
+const { getLocation } = require("./location");
 
-const { cookiesTalenta, longitude, latitude, timeClockIn, timeClockOut } = require("./config");
+const config = require("./config");
 
 const parseTime = (time) => {
   return time.split(":");
@@ -18,10 +19,32 @@ const scheduler = async (time, callback) => {
 };
 
 (async () => {
-  if (timeClockIn && timeClockOut) {
-    console.log(`Start scheduler for your clockIn every ${timeClockIn} and clockOut every ${timeClockOut}`);
-    await scheduler(timeClockIn, () => talenta.clockIn({ lat: latitude, long: longitude, cookies: cookiesTalenta, desc: "Hello I am In" }));
-    await scheduler(timeClockOut, () => talenta.clockOut({ lat: latitude, long: longitude, cookies: cookiesTalenta, desc: "Goodbye I am Out" }));
+  if (config.timeClockIn && config.timeClockOut) {
+    console.log(`Start scheduler for your clockIn every ${config.timeClockIn} and clockOut every ${config.timeClockOut}`);
+    
+    // Get location once at startup for scheduler
+    let location;
+    try {
+      location = await getLocation(config);
+      console.log(`Using location: ${location.latitude}, ${location.longitude}`);
+    } catch (error) {
+      console.error("❌ Error getting location:", error.message);
+      process.exit(1);
+    }
+    
+    await scheduler(config.timeClockIn, () => talenta.clockIn({ 
+      lat: location.latitude, 
+      long: location.longitude, 
+      cookies: config.cookiesTalenta, 
+      desc: "Hello I am In" 
+    }));
+    
+    await scheduler(config.timeClockOut, () => talenta.clockOut({ 
+      lat: location.latitude, 
+      long: location.longitude, 
+      cookies: config.cookiesTalenta, 
+      desc: "Goodbye I am Out" 
+    }));
   } else {
     console.error("✖︎ Error: timeClockIn and timeClockOut undefined");
     process.exit(1);
