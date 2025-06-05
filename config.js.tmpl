@@ -1,9 +1,21 @@
-// you can use the `_identity=` or `PHPSESSID=` cookie
+// Authentication Methods:
+// Method 1 (Recommended): Use email and password for automatic authentication
+// Method 2 (Fallback): Use manual cookies from browser
 
 module.exports = {
+    // Method 1: Automatic authentication (recommended)
+    email: '', // Your Talenta/Mekari email address
+    password: '', // Your Talenta/Mekari password
+    
+    // Method 2: Manual cookie authentication (fallback)
+    // you can use the `_identity=` or `PHPSESSID=` cookie
     cookiesTalenta: 'PHPSESSID=<value>',
+    
+    // Location settings
     longitude: '107.000',
     latitude: '-6.000',
+    
+    // Schedule settings
     timeClockIn: "09:00",
     timeClockOut: "17:00",
 }

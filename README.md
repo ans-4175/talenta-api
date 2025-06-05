@@ -34,6 +34,16 @@ This will help diagnose any remaining authentication issues and verify the signa
 
 ### How to get Cookie?
 
+**OPTION 1: Automatic (Recommended)**
+
+Use the new `fetchCookies` function to automatically get cookies:
+```javascript
+const talenta = require('talenta-api');
+const cookies = await talenta.fetchCookies('your.email@company.com', 'yourpassword');
+```
+
+**OPTION 2: Manual**
+
 1. you need to login with this url `https://account.mekari.com/users/sign_in?app_referer=Talenta` and sign in
 ![](img/login.png)
 2. after login on the browser press `F12`
@@ -107,4 +117,44 @@ Functions: `clockIn` and `clockOut`
 Parameters
 ```
 { lat: '-6.000', long: '107.000', cookies: 'PHPSESSID=<value>', desc: 'message' }
+```
+
+### Automatic Cookie Fetching 
+**NEW FEATURE**: You can now automatically fetch cookies using your Talenta credentials!
+
+Function: `fetchCookies`  
+Parameters
+```
+fetchCookies(email, password)
+```
+
+**Example usage:**
+```javascript
+const talenta = require('talenta-api');
+
+// Fetch cookies automatically
+const cookies = await talenta.fetchCookies('your.email@company.com', 'yourpassword');
+
+// Use the cookies with clockIn/clockOut
+await talenta.clockIn({
+  lat: '-6.000',
+  long: '107.000', 
+  cookies: cookies,
+  desc: 'Hello I am In'
+});
+```
+
+**Benefits:**
+- No more manual cookie extraction from browser
+- Automated authentication flow
+- Fresh cookies every time
+- Simplifies the setup process
+
+**Testing the feature:**
+```
+npm run test-fetch-cookies
+```
+or
+```
+yarn test-fetch-cookies
 ```
